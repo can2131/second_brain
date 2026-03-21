@@ -40,6 +40,16 @@ Then run with `uv run --env-file .env` to load the dev environment.
 | `LOG_LEVEL` | `INFO`     | Console log level (DEBUG, INFO, …); set to DEBUG in `.env` for verbose output |
 | `LOG_FILE`  | `app.log`  | Path to the log file                 |
 
+## Logging
+
+Log output uses a compact format with no milliseconds and single-letter levels:
+
+```
+2026-03-21 19:29:10 | I | second_brain.app:main:28 | Hello from second_brain!
+```
+
+See [docs/usage.md](docs/usage.md#logging) for the full format specification.
+
 ## Testing
 
 Run tests:

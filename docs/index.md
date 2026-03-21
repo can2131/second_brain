@@ -4,7 +4,8 @@ Welcome to the **second-brain** documentation.
 
 ## Overview
 
-second-brain is a Python application.
+second-brain is a Python application. Logs use a compact single-letter-level
+format — see the [Usage Guide](usage.md#logging) for details.
 
 ## Quick Links
 
