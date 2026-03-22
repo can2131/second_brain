@@ -1,12 +1,12 @@
 # second-brain
 
-A Python application.
-
 ## Installation
 
 Clone the repository and install dependencies:
 
 ```bash
+git clone <repo-url>
+cd second-brain
 uv sync
 ```
 
@@ -15,11 +15,16 @@ uv sync
 Via the CLI entrypoint:
 
 ```bash
-uv run second_brain                          # production defaults
-uv run --env-file .env second_brain          # dev settings
+uv run second_brain
 ```
 
-Or as a Python module:
+With dev environment variables:
+
+```bash
+uv run --env-file .env second_brain
+```
+
+Via Python module:
 
 ```bash
 uv run python -m second_brain
@@ -27,28 +32,23 @@ uv run python -m second_brain
 
 ## Environment Variables
 
-`.env.example` is the template — copy it to `.env` for development:
+`.env.example` is the committed template — copy it to `.env` for development:
 
 ```bash
 cp .env.example .env
 ```
 
-Then run with `uv run --env-file .env` to load the dev environment.
+| Variable    | Default   | Description                                         |
+|-------------|-----------|-----------------------------------------------------|
+| `LOG_LEVEL` | `INFO`    | Console log level. Set to `DEBUG` in `.env` for verbose output. |
+| `LOG_FILE`  | `app.log` | Path to the log file.                               |
 
-| Variable    | Default    | Description                          |
-|-------------|------------|--------------------------------------|
-| `LOG_LEVEL` | `INFO`     | Console log level (DEBUG, INFO, …); set to DEBUG in `.env` for verbose output |
-| `LOG_FILE`  | `app.log`  | Path to the log file                 |
+Note: `uv run --env-file .env` loads the dev environment explicitly (no auto-loading).
 
-## Logging
+## Log Format
 
-Log output uses a compact format with no milliseconds and single-letter levels:
-
-```
-2026-03-21 19:29:10 | I | second_brain.app:main:28 | Hello from second_brain!
-```
-
-See [docs/usage.md](docs/usage.md#logging) for the full format specification.
+Console output uses a compact format with 3-letter level codes (INF, DBG, WRN, etc.).
+See the [Usage Guide](docs/usage.md) for details.
 
 ## Testing
 

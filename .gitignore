@@ -215,7 +215,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Project-specific additions
+# Project-specific
+.ruff_cache
 *.log
 site/
 htmlcov/

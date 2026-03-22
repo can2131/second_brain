@@ -32,20 +32,19 @@ uv run python -m second_brain
 
 Copy `.env.example` to `.env` for development defaults, then run with `uv run --env-file .env`.
 
-## Logging
+## Log Output
 
-All log output uses a compact format:
+### Console
+
+The console (stderr) uses a compact format:
 
 ```
-2026-03-21 19:29:10 | I | second_brain.app:main:28 | Hello from second_brain!
+2026-03-21 20:34:28 | INF | second_brain.app:main:29 | Hello from second_brain!
 ```
 
-| Field     | Example                      | Notes                                                                     |
-|-----------|------------------------------|---------------------------------------------------------------------------|
-| Timestamp | `2026-03-21 19:29:10`        | No milliseconds                                                           |
-| Level     | `I`                          | Single letter: **D**ebug, **I**nfo, **W**arning, **E**rror, **C**ritical  |
-| Location  | `second_brain.app:main:28`   | module:function:line                                                      |
-| Message   | `Hello from second_brain!`   |                                                                           |
+Level names are shortened to 3 letters: TRC, DBG, INF, SUC, WRN, ERR, CRT.
 
-Separators are uniform pipes (`|`). The format is defined in `second_brain.app.LOG_FMT`
-and used by both the stderr and file handlers.
+### File
+
+The file handler (`LOG_FILE`, default `app.log`) uses loguru's default verbose
+format with millisecond timestamps, full level names, and automatic rotation.
