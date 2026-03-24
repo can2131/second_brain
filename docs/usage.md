@@ -52,6 +52,34 @@ Notes directory: /home/user/second_brain
 
 Notes are sorted oldest-modified first. Only `.md` files are shown.
 
+### `show`
+
+Print the full content of a note by its number (matching `list` order):
+
+```bash
+uv run --env-file .env second_brain show 2
+```
+
+Example session:
+
+```
+$ second_brain list
+Notes directory: /home/user/second_brain
+
+1. My idea.md                            2026-03-20
+2. Shopping list.md                      2026-03-21
+3. Work notes.md                         2026-03-24
+
+$ second_brain show 2
+# Shopping list
+
+- Milk
+- Eggs
+- Bread
+```
+
+If the number is out of range, an error is printed and the command exits with code 1.
+
 ## Environment Variables
 
 | Variable    | Default    | Description                          |
