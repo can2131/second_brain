@@ -63,3 +63,31 @@ def new(text):
     path = save_note(text, notes_dir)
     logger.success(f"Note saved: {path}")
     subprocess.run(["nano", str(path)])
+
+
+@main.command(name="list")
+def list_notes():
+    """List all notes with their last-modified dates."""
+    from datetime import datetime
+
+    notes_dir = Path(os.environ.get("NOTES_DIR", "~/second_brain")).expanduser()
+    logger.debug(f"Listing notes in: {notes_dir}")
+    click.echo(f"Notes directory: {notes_dir}")
+    click.echo()
+
+    if not notes_dir.exists():
+        click.echo("No notes found.")
+        return
+
+    notes = sorted(
+        (p for p in notes_dir.iterdir() if p.suffix == ".md"),
+        key=lambda p: p.stat().st_mtime,
+    )
+
+    if not notes:
+        click.echo("No notes found.")
+        return
+
+    for i, note in enumerate(notes, start=1):
+        date = datetime.fromtimestamp(note.stat().st_mtime).strftime("%Y-%m-%d")
+        click.echo(f"{i}. {note.name:<40} {date}")

@@ -30,6 +30,33 @@ Via Python module:
 uv run python -m second_brain
 ```
 
+## Commands
+
+### `second_brain new <text>`
+
+Save a new note and open it in nano.
+
+```bash
+uv run --env-file .env second_brain new "My idea"
+```
+
+### `second_brain list`
+
+Show all notes in the notes directory with their last-modified dates.
+
+```bash
+uv run --env-file .env second_brain list
+```
+
+Example output:
+
+```
+Notes directory: /home/user/second_brain
+
+1. My idea.md                            2026-03-20
+2. Shopping list.md                      2026-03-21
+```
+
 ## Environment Variables
 
 `.env.example` is the committed template — copy it to `.env` for development:

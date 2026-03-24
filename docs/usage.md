@@ -23,6 +23,35 @@ Or as a Python module:
 uv run python -m second_brain
 ```
 
+## Commands
+
+### `new`
+
+Save a new note and open it in nano:
+
+```bash
+uv run --env-file .env second_brain new "My idea"
+```
+
+### `list`
+
+Show all notes in the notes directory with their last-modified dates:
+
+```bash
+uv run --env-file .env second_brain list
+```
+
+Example output:
+
+```
+Notes directory: /home/user/second_brain
+
+1. My idea.md                            2026-03-20
+2. Shopping list.md                      2026-03-21
+```
+
+Notes are sorted oldest-modified first. Only `.md` files are shown.
+
 ## Environment Variables
 
 | Variable    | Default    | Description                          |

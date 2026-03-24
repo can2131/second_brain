@@ -81,6 +81,61 @@ def test_new_command_opens_editor(tmp_path, monkeypatch):
     mock_run.assert_called_once_with(["nano", str(tmp_path / "My idea.md")])
 
 
+def test_list_command_shows_directory_and_notes(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    (tmp_path / "alpha.md").write_text("# alpha")
+    (tmp_path / "beta.md").write_text("# beta")
+    runner = CliRunner()
+    result = runner.invoke(main, ["list"], catch_exceptions=False)
+    assert result.exit_code == 0
+    assert f"Notes directory: {tmp_path}" in result.output
+    assert "alpha.md" in result.output
+    assert "beta.md" in result.output
+
+
+def test_list_command_shows_numbered_entries(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    (tmp_path / "note.md").write_text("# note")
+    runner = CliRunner()
+    result = runner.invoke(main, ["list"], catch_exceptions=False)
+    assert "1." in result.output
+
+
+def test_list_command_shows_modified_date(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    (tmp_path / "note.md").write_text("# note")
+    runner = CliRunner()
+    result = runner.invoke(main, ["list"], catch_exceptions=False)
+    import re
+    assert re.search(r"\d{4}-\d{2}-\d{2}", result.output)
+
+
+def test_list_command_skips_non_markdown_files(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    (tmp_path / "note.md").write_text("# note")
+    (tmp_path / "other.txt").write_text("ignore me")
+    runner = CliRunner()
+    result = runner.invoke(main, ["list"], catch_exceptions=False)
+    assert "other.txt" not in result.output
+
+
+def test_list_command_empty_directory(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    runner = CliRunner()
+    result = runner.invoke(main, ["list"], catch_exceptions=False)
+    assert result.exit_code == 0
+    assert "No notes found." in result.output
+
+
+def test_list_command_missing_directory(tmp_path, monkeypatch):
+    missing = tmp_path / "does_not_exist"
+    monkeypatch.setenv("NOTES_DIR", str(missing))
+    runner = CliRunner()
+    result = runner.invoke(main, ["list"], catch_exceptions=False)
+    assert result.exit_code == 0
+    assert "No notes found." in result.output
+
+
 def test_file_handler_uses_default_format(tmp_path, monkeypatch):
     log_file = tmp_path / "verify.log"
     monkeypatch.setenv("LOG_FILE", str(log_file))
