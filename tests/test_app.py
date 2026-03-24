@@ -1,6 +1,8 @@
 import re
+from unittest.mock import patch
 
 import pytest
+from click.testing import CliRunner
 
 from second_brain.app import console_format, main
 
@@ -49,29 +51,43 @@ def test_console_format_unknown_level_falls_back_to_slice():
     assert "CUS" in result
 
 
-# -- Integration tests -------------------------------------------------------
+# -- CLI integration tests ---------------------------------------------------
 
 
-def test_main_logs_greeting(capfd):
-    main()
-    captured = capfd.readouterr()
-    assert "Hello from second_brain!" in captured.err
+def test_new_command_saves_note(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    runner = CliRunner()
+    with patch("second_brain.app.subprocess.run"):
+        result = runner.invoke(main, ["new", "My idea"], catch_exceptions=False)
+    assert result.exit_code == 0
+    assert (tmp_path / "My idea.md").exists()
+    assert (tmp_path / "My idea.md").read_text() == "# My idea\n"
 
 
-def test_main_console_output_matches_compact_format(capfd):
-    main()
-    captured = capfd.readouterr()
-    lines = [ln for ln in captured.err.strip().splitlines() if ln.strip()]
-    assert lines, "Expected at least one log line on stderr"
-    pattern = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \| \w{3} \| .+:.+:\d+ \| .+"
-    for line in lines:
-        assert re.match(pattern, line), f"Line does not match compact format: {line!r}"
+def test_new_command_respects_notes_dir_env(tmp_path, monkeypatch):
+    custom_dir = tmp_path / "custom_notes"
+    monkeypatch.setenv("NOTES_DIR", str(custom_dir))
+    runner = CliRunner()
+    with patch("second_brain.app.subprocess.run"):
+        runner.invoke(main, ["new", "test"], catch_exceptions=False)
+    assert (custom_dir / "test.md").exists()
+
+
+def test_new_command_opens_editor(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    runner = CliRunner()
+    with patch("second_brain.app.subprocess.run") as mock_run:
+        runner.invoke(main, ["new", "My idea"], catch_exceptions=False)
+    mock_run.assert_called_once_with(["nano", str(tmp_path / "My idea.md")])
 
 
 def test_file_handler_uses_default_format(tmp_path, monkeypatch):
     log_file = tmp_path / "verify.log"
     monkeypatch.setenv("LOG_FILE", str(log_file))
-    main()
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path / "notes"))
+    runner = CliRunner()
+    with patch("second_brain.app.subprocess.run"):
+        runner.invoke(main, ["new", "test note"], catch_exceptions=False)
     content = log_file.read_text()
-    assert "INFO" in content
-    assert " - Hello from second_brain!" in content
+    assert "SUCCESS" in content
+    assert "Note saved:" in content

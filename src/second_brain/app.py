@@ -1,5 +1,9 @@
+import os
+import subprocess
 import sys
+from pathlib import Path
 
+import click
 from loguru import logger
 
 LEVEL_SHORT = {
@@ -36,8 +40,6 @@ def configure_logging():
     - stderr handler at LOG_LEVEL (default: INFO) with compact format
     - File handler at DEBUG level writing to LOG_FILE (default: app.log)
     """
-    import os
-
     log_level = os.environ.get("LOG_LEVEL", "INFO")
     log_file = os.environ.get("LOG_FILE", "app.log")
     logger.remove()
@@ -45,11 +47,19 @@ def configure_logging():
     logger.add(log_file, level="DEBUG", rotation="50 KB", retention=1)
 
 
-@logger.catch
+@click.group()
 def main():
-    """Run the application.
-
-    Configures logging and prints a greeting to verify the setup works.
-    """
+    """Second brain — capture thoughts from the command line."""
     configure_logging()
-    logger.info("Hello from second_brain!")
+
+
+@main.command()
+@click.argument("text")
+def new(text):
+    """Save TEXT as a new note."""
+    from second_brain.notes import save_note
+
+    notes_dir = Path(os.environ.get("NOTES_DIR", "~/second_brain")).expanduser()
+    path = save_note(text, notes_dir)
+    logger.success(f"Note saved: {path}")
+    subprocess.run(["nano", str(path)])
