@@ -136,6 +136,63 @@ def test_list_command_missing_directory(tmp_path, monkeypatch):
     assert "No notes found." in result.output
 
 
+def test_show_command_prints_note_content(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    (tmp_path / "first.md").write_text("# First note\nContent A")
+    (tmp_path / "second.md").write_text("# Second note\nContent B")
+    # ensure second is newer
+    import time
+    time.sleep(0.01)
+    (tmp_path / "second.md").touch()
+    runner = CliRunner()
+    result = runner.invoke(main, ["show", "2"], catch_exceptions=False)
+    assert result.exit_code == 0
+    assert "# Second note" in result.output
+    assert "Content B" in result.output
+
+
+def test_show_command_numbering_matches_list(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    older = tmp_path / "older.md"
+    newer = tmp_path / "newer.md"
+    older.write_text("# Older")
+    import time
+    time.sleep(0.01)
+    newer.write_text("# Newer")
+    runner = CliRunner()
+    show1 = runner.invoke(main, ["show", "1"], catch_exceptions=False)
+    show2 = runner.invoke(main, ["show", "2"], catch_exceptions=False)
+    assert "# Older" in show1.output
+    assert "# Newer" in show2.output
+
+
+def test_show_command_out_of_range(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    (tmp_path / "note.md").write_text("# note")
+    runner = CliRunner()
+    result = runner.invoke(main, ["show", "99"])
+    assert result.exit_code == 1
+    assert "Error: note 99 not found." in result.output
+    assert "second_brain list" in result.output
+
+
+def test_show_command_empty_directory(tmp_path, monkeypatch):
+    monkeypatch.setenv("NOTES_DIR", str(tmp_path))
+    runner = CliRunner()
+    result = runner.invoke(main, ["show", "1"], catch_exceptions=False)
+    assert result.exit_code == 0
+    assert "No notes found." in result.output
+
+
+def test_show_command_missing_directory(tmp_path, monkeypatch):
+    missing = tmp_path / "does_not_exist"
+    monkeypatch.setenv("NOTES_DIR", str(missing))
+    runner = CliRunner()
+    result = runner.invoke(main, ["show", "1"], catch_exceptions=False)
+    assert result.exit_code == 0
+    assert "No notes found." in result.output
+
+
 def test_file_handler_uses_default_format(tmp_path, monkeypatch):
     log_file = tmp_path / "verify.log"
     monkeypatch.setenv("LOG_FILE", str(log_file))

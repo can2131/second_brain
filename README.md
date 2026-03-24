@@ -57,6 +57,24 @@ Notes directory: /home/user/second_brain
 2. Shopping list.md                      2026-03-21
 ```
 
+### `second_brain show <number>`
+
+Print the full content of note `<number>` to stdout. The number matches the index shown by `second_brain list`.
+
+```bash
+uv run --env-file .env second_brain show 2
+```
+
+Example output:
+
+```
+# Shopping list
+
+- Milk
+- Eggs
+- Bread
+```
+
 ## Environment Variables
 
 `.env.example` is the committed template — copy it to `.env` for development:
